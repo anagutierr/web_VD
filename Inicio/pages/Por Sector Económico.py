@@ -40,14 +40,14 @@ st.markdown("<div style='margin: 40px 0;'></div>", unsafe_allow_html=True)
 @st.cache_data
 def cargar_datos():
     with st.spinner('Cargando datos de empleo por género...'):
-        return pd.read_csv("data/dataset_final_formateado.csv", parse_dates=["fecha"])
+        return pd.read_csv("Inicio/data/dataset_final_formateado.csv", parse_dates=["fecha"])
 
 @st.cache_data
 def cargar_geodatos():
     with st.spinner('Cargando datos geográficos...'):
-        gdf_ccaa = gpd.read_file("src/mapa/se89_3_admin_ccaa_a_x.shp")
-        gdf_prov = gpd.read_file("src/mapa/recintos_provinciales_inspire_peninbal_etrs89.shp")
-        gdf_mun = gpd.read_file("src/mapa/recintos_municipales_inspire_peninbal_etrs89.shp")
+        gdf_ccaa = gpd.read_file("Inicio/src/mapa/se89_3_admin_ccaa_a_x.shp")
+        gdf_prov = gpd.read_file("Inicio/src/mapa/recintos_provinciales_inspire_peninbal_etrs89.shp")
+        gdf_mun = gpd.read_file("Inicio/src/mapa/recintos_municipales_inspire_peninbal_etrs89.shp")
         return gdf_ccaa, gdf_prov, gdf_mun
 
 df = cargar_datos()
