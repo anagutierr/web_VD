@@ -6,7 +6,13 @@ import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import time
-from Inicio.utils import cargar_datos, cargar_geodatos
+import sys
+import os
+
+# Ruta absoluta a la carpeta Inicio, ajusta según tu estructura real
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+
+from utils import cargar_datos, cargar_geodatos
 
 # ---------------------------
 # CONFIGURACIÓN DE PÁGINA
