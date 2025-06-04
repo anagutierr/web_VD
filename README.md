@@ -26,6 +26,3 @@ Todo ello presentado de forma visual, intuitiva y accesible.
 - PIL (para imágenes)
 - HTML + CSS (estilización de componentes)
 
-## 📷 Vista previa
-
-![Header](data/header.jpg)
