@@ -6,6 +6,8 @@ import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import numpy as np
+from Inicio.utils import cargar_datos, cargar_geodatos
+
 
 # ---------------------------
 # CONFIGURACIÓN DE PÁGINA
@@ -15,21 +17,6 @@ st.set_page_config(
     page_icon="👥", 
     layout="wide"
 )
-
-# ---------------------------
-# CARGA DE DATOS CON INDICADOR
-# ---------------------------
-@st.cache_data
-def cargar_datos():
-    with st.spinner('Cargando datos de empleo por género...'):
-        return pd.read_csv("Inicio/data/dataset_final_formateado.csv", parse_dates=["fecha"])
-
-@st.cache_data
-def cargar_geodatos():
-    with st.spinner('Cargando datos geográficos...'):
-        gdf_ccaa = gpd.read_file("Inicio/src/mapa/se89_3_admin_ccaa_a_x.shp")
-        gdf_prov = gpd.read_file("Inicio/src/mapa/recintos_provinciales_inspire_peninbal_etrs89.shp")
-        return gdf_ccaa, gdf_prov
 
 df = cargar_datos()
 gdf_ccaa, gdf_prov = cargar_geodatos()
