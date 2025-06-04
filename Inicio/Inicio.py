@@ -64,7 +64,7 @@ def run():
     )
 
     # Cargar y codificar la imagen en base64
-    imagen_path = "data/header.jpg"
+    imagen_path = "Inicio/data/header.jpg"
     with open(imagen_path, "rb") as f:
         data = f.read()
         encoded = base64.b64encode(data).decode()
