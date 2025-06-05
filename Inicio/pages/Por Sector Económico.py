@@ -44,7 +44,7 @@ st.markdown("<div style='margin: 40px 0;'></div>", unsafe_allow_html=True)
 # CARGA DE DATOS CON INDICADOR
 # ---------------------------
 df = cargar_datos()
-gdf_ccaa, gdf_prov = cargar_geodatos()
+gdf_ccaa = cargar_geodatos()
 
 # ---------------------------
 # EQUIVALENCIAS DE PROVINCIAS
@@ -465,6 +465,17 @@ with col2:
 columnas = st.columns(len(años_mapa))
 dominancia_stats = {}
 
+if nivel_geografico == "Provincias":
+    st.info(
+        "⚠️ Por limitaciones de memoria RAM en Streamlit Cloud, "
+        "la visualización por provincias no está disponible en la versión desplegada. "
+        "Si ejecutas este proyecto en local, podrás ver también los mapas por provincias. " \
+        "En el vídeo demostrativo se muestra esta funcionalidad." 
+    )
+
+    st.stop()
+  
+
 for i, año in enumerate(sorted(años_mapa, reverse=True)):
     df_geo = df[df['año'] == año].copy()
     
@@ -477,51 +488,51 @@ for i, año in enumerate(sorted(años_mapa, reverse=True)):
         gdf = gdf_ccaa
         hover_col = 'rotulo'
         unidad_geografica = "CC.AA."
-    else: 
-        df_mapa = df_geo.groupby('provincia').agg({
-            config['columna']: 'sum' for config in sectores_config.values()
-        }).reset_index()
-        key_col = 'provincia'
-        merge_col = 'NAMEUNIT'
-        gdf = gdf_prov
-        hover_col = 'NAMEUNIT'
-        unidad_geografica = "Provincias"
+    # else: 
+    #     df_mapa = df_geo.groupby('provincia').agg({
+    #         config['columna']: 'sum' for config in sectores_config.values()
+    #     }).reset_index()
+    #     key_col = 'provincia'
+    #     merge_col = 'NAMEUNIT'
+    #     gdf = gdf_prov
+    #     hover_col = 'NAMEUNIT'
+    #     unidad_geografica = "Provincias"
 
-    gdf_mapa = gdf.merge(df_mapa, left_on=merge_col, right_on=key_col, how='left')
+        gdf_mapa = gdf.merge(df_mapa, left_on=merge_col, right_on=key_col, how='left')
 
-    sectores_cols = [config['columna'] for config in sectores_config.values()]
-    for col in sectores_cols:
-        if col in gdf_mapa.columns:
-            media_col = gdf_mapa[col].mean(skipna=True)
-            gdf_mapa[col] = gdf_mapa[col].fillna(media_col)
+        sectores_cols = [config['columna'] for config in sectores_config.values()]
+        for col in sectores_cols:
+            if col in gdf_mapa.columns:
+                media_col = gdf_mapa[col].mean(skipna=True)
+                gdf_mapa[col] = gdf_mapa[col].fillna(media_col)
 
-    gdf_mapa['sector_dominante'] = gdf_mapa[sectores_cols].idxmax(axis=1)
-    gdf_mapa['sector_dominante'] = gdf_mapa['sector_dominante'].map({
-        config['columna']: sector for sector, config in sectores_config.items()
-    })
+        gdf_mapa['sector_dominante'] = gdf_mapa[sectores_cols].idxmax(axis=1)
+        gdf_mapa['sector_dominante'] = gdf_mapa['sector_dominante'].map({
+            config['columna']: sector for sector, config in sectores_config.items()
+        })
 
-    dominancia_count = gdf_mapa['sector_dominante'].value_counts()
-    dominancia_stats[año] = {
-        'counts': dominancia_count,
-        'unidad': unidad_geografica
-    }
+        dominancia_count = gdf_mapa['sector_dominante'].value_counts()
+        dominancia_stats[año] = {
+            'counts': dominancia_count,
+            'unidad': unidad_geografica
+        }
 
-    color_map = {sector: config['color'] for sector, config in sectores_config.items()}
+        color_map = {sector: config['color'] for sector, config in sectores_config.items()}
 
-    fig = px.choropleth(
-        gdf_mapa,
-        geojson=gdf_mapa.geometry.__geo_interface__,
-        locations=gdf_mapa.index,
-        color='sector_dominante',
-        hover_name=hover_col,
-        color_discrete_map=color_map,
-        title=f"{año}"
-    )
-    fig.update_geos(fitbounds="locations", visible=False)
-    fig.update_layout(height=400, margin=dict(l=0, r=0, t=40, b=0))
+        fig = px.choropleth(
+            gdf_mapa,
+            geojson=gdf_mapa.geometry.__geo_interface__,
+            locations=gdf_mapa.index,
+            color='sector_dominante',
+            hover_name=hover_col,
+            color_discrete_map=color_map,
+            title=f"{año}"
+        )
+        fig.update_geos(fitbounds="locations", visible=False)
+        fig.update_layout(height=400, margin=dict(l=0, r=0, t=40, b=0))
 
-    with columnas[i]:
-        st.plotly_chart(fig, use_container_width=True)
+        with columnas[i]:
+            st.plotly_chart(fig, use_container_width=True)
 
 
 # ---------------------------

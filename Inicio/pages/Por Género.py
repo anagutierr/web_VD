@@ -23,7 +23,7 @@ st.set_page_config(
 )
 
 df = cargar_datos()
-gdf_ccaa, gdf_prov = cargar_geodatos()
+gdf_ccaa = cargar_geodatos()
 
 # ---------------------------
 # EQUIVALENCIAS DE PROVINCIAS
@@ -497,43 +497,49 @@ if años_mapa:
                     
         else:
             # Datos para Provincias
-            mapa_data = []
-            valores_brecha = []
+              st.info(
+                    "⚠️ Por limitaciones de memoria RAM en Streamlit Cloud, "
+                    "la visualización por provincias no está disponible en la versión desplegada. "
+                    "Si ejecutas este proyecto en local, podrás ver también los mapas por provincias. " \
+                    "En el vídeo demostrativo se muestra esta funcionalidad." 
+                )
+            # mapa_data = []
+            # valores_brecha = []
             
-            for año in años_mapa:
-                df_año = df_mapa[df_mapa["año"] == año]
-                df_año["provincia_corr"] = df_año["provincia"].replace(equivalencias_provincias)
-                df_grouped = df_año.groupby("provincia_corr")["brecha_relativa_contratos"].mean().reset_index()
+            # for año in años_mapa:
+            #     df_año = df_mapa[df_mapa["año"] == año]
+            #     df_año["provincia_corr"] = df_año["provincia"].replace(equivalencias_provincias)
+            #     df_grouped = df_año.groupby("provincia_corr")["brecha_relativa_contratos"].mean().reset_index()
 
-                gdf_plot = gdf_prov.set_index("NAMEUNIT").join(df_grouped.set_index("provincia_corr")).reset_index()
-                mapa_data.append((año, gdf_plot))
-                valores_brecha.extend(gdf_plot["brecha_relativa_contratos"].dropna().tolist())
-            if valores_brecha:
-                absmax = max(abs(min(valores_brecha)), abs(max(valores_brecha)))
-                rango_color = [-absmax, absmax]
-            else:
-                rango_color = [-0.1, 0.1]
+            #     gdf_plot = gdf_prov.set_index("NAMEUNIT").join(df_grouped.set_index("provincia_corr")).reset_index()
+            #     mapa_data.append((año, gdf_plot))
+            #     valores_brecha.extend(gdf_plot["brecha_relativa_contratos"].dropna().tolist())
+            # if valores_brecha:
+            #     absmax = max(abs(min(valores_brecha)), abs(max(valores_brecha)))
+            #     rango_color = [-absmax, absmax]
+            # else:
+            #     rango_color = [-0.1, 0.1]
             
-            cols_mapa = st.columns(len(años_mapa))
-            for i, (año, gdf_plot) in enumerate(mapa_data):
-                with cols_mapa[i]:
-                    fig_mapa = px.choropleth(
-                        gdf_plot,
-                        geojson=gdf_plot.geometry.__geo_interface__,
-                        locations=gdf_plot.index,
-                        color="brecha_relativa_contratos",
-                        hover_name="NAMEUNIT",
-                        color_continuous_scale="RdBu_r",
-                        range_color=rango_color,
-                        title=f"<b>{año}</b>"
-                    )
-                    fig_mapa.update_geos(fitbounds="locations", visible=False)
-                    fig_mapa.update_layout(
-                        height=450,
-                        title_x=0.5,
-                        coloraxis_showscale=(i == len(años_mapa) - 1)
-                    )
-                    st.plotly_chart(fig_mapa, use_container_width=True)
+            # cols_mapa = st.columns(len(años_mapa))
+            # for i, (año, gdf_plot) in enumerate(mapa_data):
+            #     with cols_mapa[i]:
+            #         fig_mapa = px.choropleth(
+            #             gdf_plot,
+            #             geojson=gdf_plot.geometry.__geo_interface__,
+            #             locations=gdf_plot.index,
+            #             color="brecha_relativa_contratos",
+            #             hover_name="NAMEUNIT",
+            #             color_continuous_scale="RdBu_r",
+            #             range_color=rango_color,
+            #             title=f"<b>{año}</b>"
+            #         )
+            #         fig_mapa.update_geos(fitbounds="locations", visible=False)
+            #         fig_mapa.update_layout(
+            #             height=450,
+            #             title_x=0.5,
+            #             coloraxis_showscale=(i == len(años_mapa) - 1)
+            #         )
+            #         st.plotly_chart(fig_mapa, use_container_width=True)
     
 
 st.markdown("#### 📈 Resumen Comparativo")

@@ -25,7 +25,7 @@ st.set_page_config(
 
 # Cargar datos
 df = cargar_datos()
-gdf_ccaa, gdf_prov = cargar_geodatos()
+gdf_ccaa = cargar_geodatos()
 
 
 # ---------------------------
@@ -329,9 +329,9 @@ with st.spinner('Generando mapas interactivos...'):
         gdf_plot_ccaa = gdf_ccaa.set_index("rotulo").join(df_grouped_ccaa.set_index("comunidad_autónoma")).reset_index()
         
         # Datos para Provincias
-        df_year["provincia_corr"] = df_year["provincia"].replace(equivalencias_provincias)
-        df_grouped_prov = df_year.groupby("provincia_corr")[[color_col]].mean().reset_index()
-        gdf_plot_prov = gdf_prov.set_index("NAMEUNIT").join(df_grouped_prov.set_index("provincia_corr")).reset_index()
+        #df_year["provincia_corr"] = df_year["provincia"].replace(equivalencias_provincias)
+        #df_grouped_prov = df_year.groupby("provincia_corr")[[color_col]].mean().reset_index()
+        #gdf_plot_prov = gdf_prov.set_index("NAMEUNIT").join(df_grouped_prov.set_index("provincia_corr")).reset_index()
         
         col_mapa1, col_mapa2 = st.columns(2)
         
@@ -351,19 +351,26 @@ with st.spinner('Generando mapas interactivos...'):
             st.plotly_chart(fig_map_ccaa, use_container_width=True)
         
         with col_mapa2:
-            fig_map_prov = px.choropleth(
-                gdf_plot_prov,
-                geojson=gdf_plot_prov.geometry.__geo_interface__,
-                locations=gdf_plot_prov.index,
-                color=color_col,
-                hover_name="NAMEUNIT",
-                color_continuous_scale=color_scale,
-                projection="mercator",
-                title=f"{titulo_base} - {año}<br><sub>Por Provincia</sub>"
+            st.info(
+                "⚠️ Por limitaciones de memoria RAM en Streamlit Cloud, "
+                "la visualización por provincias no está disponible en la versión desplegada. "
+                "Si ejecutas este proyecto en local, podrás ver también los mapas por provincias. " \
+                "En el vídeo demostrativo se muestra esta funcionalidad." 
             )
-            fig_map_prov.update_geos(fitbounds="locations", visible=False)
-            fig_map_prov.update_layout(height=600)
-            st.plotly_chart(fig_map_prov, use_container_width=True)
+
+        #    fig_map_prov = px.choropleth(
+        #        gdf_plot_prov,
+        #        geojson=gdf_plot_prov.geometry.__geo_interface__,
+        #        locations=gdf_plot_prov.index,
+        #        color=color_col,
+        #        hover_name="NAMEUNIT",
+        #        color_continuous_scale=color_scale,
+        #        projection="mercator",
+        #        title=f"{titulo_base} - {año}<br><sub>Por Provincia</sub>"
+        #    )
+        #    fig_map_prov.update_geos(fitbounds="locations", visible=False)
+        #    fig_map_prov.update_layout(height=600)
+        #    st.plotly_chart(fig_map_prov, use_container_width=True)
     
     else:
         # Modo comparativa multi-año
@@ -387,18 +394,18 @@ with st.spinner('Generando mapas interactivos...'):
             datos_ccaa_todos.append((año, gdf_plot_ccaa, color_col))
             
             # Provincias
-            df_year["provincia_corr"] = df_year["provincia"].replace(equivalencias_provincias)
-            df_grouped_prov = df_year.groupby("provincia_corr")[[color_col]].mean().reset_index()
-            gdf_plot_prov = gdf_prov.set_index("NAMEUNIT").join(df_grouped_prov.set_index("provincia_corr")).reset_index()
-            datos_prov_todos.append((año, gdf_plot_prov, color_col))
+            #df_year["provincia_corr"] = df_year["provincia"].replace(equivalencias_provincias)
+            #df_grouped_prov = df_year.groupby("provincia_corr")[[color_col]].mean().reset_index()
+            #gdf_plot_prov = gdf_prov.set_index("NAMEUNIT").join(df_grouped_prov.set_index("provincia_corr")).reset_index()
+            #datos_prov_todos.append((año, gdf_plot_prov, color_col))
             
             # Recoger valores para rango común
             valores_ccaa = gdf_plot_ccaa[color_col].dropna()
-            valores_prov = gdf_plot_prov[color_col].dropna()
+            #valores_prov = gdf_plot_prov[color_col].dropna()
             if len(valores_ccaa) > 0:
                 valores_min_max.extend([valores_ccaa.min(), valores_ccaa.max()])
-            if len(valores_prov) > 0:
-                valores_min_max.extend([valores_prov.min(), valores_prov.max()])
+            #if len(valores_prov) > 0:
+            #    valores_min_max.extend([valores_prov.min(), valores_prov.max()])
         
         if valores_min_max:
             rango_min = min(valores_min_max)
@@ -433,30 +440,36 @@ with st.spinner('Generando mapas interactivos...'):
                 st.plotly_chart(fig_map_ccaa, use_container_width=True)
         
         st.markdown("##### Por Provincias")
-        cols_prov = st.columns(len(años_seleccionados))
+        st.info(
+            "⚠️ Por limitaciones de memoria RAM en Streamlit Cloud, "
+            "la visualización por provincias no está disponible en la versión desplegada. "
+            "Si ejecutas este proyecto en local, podrás ver también los mapas por provincias. " \
+            "En el vídeo demostrativo se muestra esta funcionalidad." 
+        )
+        #cols_prov = st.columns(len(años_seleccionados))
         
-        for i, (año, gdf_plot_prov, color_col) in enumerate(datos_prov_todos):
-            with cols_prov[i]:
-                fig_map_prov = px.choropleth(
-                    gdf_plot_prov,
-                    geojson=gdf_plot_prov.geometry.__geo_interface__,
-                    locations=gdf_plot_prov.index,
-                    color=color_col,
-                    hover_name="NAMEUNIT",
-                    color_continuous_scale=color_scale,
-                    projection="mercator",
-                    title=f"<b>{año}</b>",
-                    range_color=[rango_min, rango_max] 
-                )
-                fig_map_prov.update_geos(fitbounds="locations", visible=False)
-                fig_map_prov.update_layout(
-                    height=450,
-                    title_x=0.5,
-                    title_font_size=16,
-                    margin=dict(l=0, r=0, t=40, b=0),
-                    coloraxis_showscale=(i == len(años_seleccionados) - 1) 
-                )
-                st.plotly_chart(fig_map_prov, use_container_width=True)
+        #for i, (año, gdf_plot_prov, color_col) in enumerate(datos_prov_todos):
+        #    with cols_prov[i]:
+        #        fig_map_prov = px.choropleth(
+        #            gdf_plot_prov,
+        #            geojson=gdf_plot_prov.geometry.__geo_interface__,
+        #            locations=gdf_plot_prov.index,
+        #            color=color_col,
+        #            hover_name="NAMEUNIT",
+        #            color_continuous_scale=color_scale,
+        #            projection="mercator",
+        #            title=f"<b>{año}</b>",
+        #            range_color=[rango_min, rango_max] 
+        #        )
+        #        fig_map_prov.update_geos(fitbounds="locations", visible=False)
+        #        fig_map_prov.update_layout(
+        #            height=450,
+        #            title_x=0.5,
+        #            title_font_size=16,
+        #            margin=dict(l=0, r=0, t=40, b=0),
+        #            coloraxis_showscale=(i == len(años_seleccionados) - 1) 
+        #        )
+        #        st.plotly_chart(fig_map_prov, use_container_width=True)
 
 # ---------------------------
 # ESTADÍSTICAS RESUMEN
