@@ -26,3 +26,10 @@ Todo ello presentado de forma visual, intuitiva y accesible.
 - PIL (para imágenes)
 - HTML + CSS (estilización de componentes)
 
+### Web del proyecto:
+https://webvdanagutierrezmandingorra.streamlit.app/
+
+Por limitaciones de memoria RAM en Streamlit Cloud, la visualización por provincias no está disponible en la versión desplegada.
+Si se ejecuta este proyecto en local, está opción está habilitada pudiendo ver también los mapas por provincias. 
+En el vídeo demostrativo se muestra esta funcionalidad.
+
